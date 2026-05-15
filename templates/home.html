@@ -3,9 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>California House Pricing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --sand: #f5f0e8;
+            --clay: #c8a882;
+            --terracotta: #b5603a;
+            --deep: #1c1a17;
+            --muted: #7a7060;
+            --card-bg: #ffffff;
+            --border: #e4ddd2;
+        }
+
+        *{ box-sizing: border-box; }
+
+        body{
+            background-color: var(--sand);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--deep);
+            min-height: 100vh;
+        }
+
+        body::before{
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 60px,
+                    rgba(180,150,100,0.07) 60px,
+                    rgba(180,150,100,0.07) 61px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 60px,
+                    rgba(180,150,100,0.07) 60px,
+                    rgba(180,150,100,0.07) 61px
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page-wrapper{
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .accent-panel{
+            width: 6px;
+            background: linear-gradient(to bottom, var(--terracotta), var(--clay));
+            flex-shrink: 0;
+        }
+
+        .main-content{
+            flex: 1;
+            padding: 3rem 2rem;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .page-header{
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .eyebrow{
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--terracotta);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title{
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            line-height: 1.1;
+            color: var(--deep);
+            margin: 0 0 0.5rem;
+        }
+
+        .page-subtitle{
+            font-size: 0.9rem;
+            color: var(--muted);
+            font-weight: 300;
+            margin: 0;
+        }
+
+        .form-card{
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 2rem 2.5rem;
+            box-shadow: 0 2px 20px rgba(28,26,23,0.06), 0 1px 4px rgba(28,26,23,0.04);
+        }
+
+        .section-label{
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--clay);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .form-label{
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--deep);
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.01em;
+        }
+
+        .field-hint{
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-weight: 300;
+            margin-top: 0.2rem;
+        }
+
+        .form-control{
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            background: var(--sand);
+            color: var(--deep);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            padding: 0.55rem 0.85rem;
+            transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+        }
+
+        .form-control::placeholder{
+            color: #bbb5a8;
+            font-weight: 300;
+        }
+
+        .form-control:focus{
+            border-color: var(--terracotta);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(181,96,58,0.1);
+            outline: none;
+        }
+
+        .input-icon-wrap{
+            position: relative;
+        }
+
+        .input-icon-wrap .field-icon{
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: var(--clay);
+            pointer-events: none;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .input-icon-wrap .form-control{
+            padding-right: 2.5rem;
+        }
+
+        .grid-divider{
+            height: 1px;
+            background: var(--border);
+            margin: 1.5rem 0;
+        }
+        .btn-predict{
+            background: var(--terracotta);
+            color: #fff;
+            border: none;
+            border-radius: 2px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.75rem 2.5rem;
+            transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
+            cursor: pointer;
+        }
+
+        .btn-predict:hover{
+            background: #a04f2c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(181,96,58,0.3);
+            color: #fff;
+        }
+
+        .btn-predict:active{
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .btn-reset{
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            padding: 0.75rem 1.5rem;
+            transition: border-color 0.18s, color 0.18s;
+            cursor: pointer;
+        }
+
+        .btn-reset:hover{
+            border-color: var(--muted);
+            color: var(--deep);
+        }
+        .footer-note{
+            margin-top: 1.5rem;
+            font-size: 0.7rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .footer-note::before{
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 1px;
+            background: var(--clay);
+        }
+
+        /* Responsive */
+        @media (max-width: 576px){
+            .form-card{ padding: 1.5rem; }
+            .main-content{ padding: 2rem 1rem; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello</h1>
+<div class="page-wrapper">
+    <div class="accent-panel"></div>
+
+    <div class="main-content">
+        <header class="page-header">
+            <p class="eyebrow">ML Prediction Model · California Census Data</p>
+            <h1 class="page-title">House Price<br><em>Estimator</em></h1>
+            <p class="page-subtitle">Enter block group statistics to generate a median home value prediction.</p>
+        </header>
+                {% if prediction_text %}
+                <div class="alert mt-4" role="alert"
+                    style="background:#fff3ed; border-left: 4px solid var(--terracotta); border-radius:2px; color:var(--deep); font-family:'DM Sans',sans-serif;">
+                    {{ prediction_text }}
+                </div>
+            {% endif %}
+
+        <div class="form-card">
+            <form method="post" action="{{ url_for('predict') }}">
+
+                <p class="section-label">Economics &amp; Demographics</p>
+                <div class="row g-3 mb-0">
+                    <div class="col-md-6">
+                        <label for="MedInc" class="form-label">Median Income</label>
+                        <div class="input-icon-wrap">
+                            <input type="text" class="form-control" id="MedInc" name="MedInc" placeholder="e.g. 3.87" required>
+                            <span class="field-icon">×10k</span>
+                        </div>
+                        <p class="field-hint">Median household income in block group (in $10,000s)</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="Population" class="form-label">Population</label>
+                        <div class="input-icon-wrap">
+                            <input type="text" class="form-control" id="Population" name="Population" placeholder="e.g. 1200" required>
+                            <span class="field-icon">ppl</span>
+                        </div>
+                        <p class="field-hint">Total population of the block group</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="AveOccup" class="form-label">Avg. Occupants</label>
+                        <div class="input-icon-wrap">
+                            <input type="text" class="form-control" id="AveOccup" name="AveOccup" placeholder="e.g. 2.8" required>
+                            <span class="field-icon">avg</span>
+                        </div>
+                        <p class="field-hint">Average number of household members</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="HouseAge" class="form-label">House Age</label>
+                        <div class="input-icon-wrap">
+                            <input type="text" class="form-control" id="HouseAge" name="HouseAge" placeholder="e.g. 28" required>
+                            <span class="field-icon">yrs</span>
+                        </div>
+                        <p class="field-hint">Median age of houses in block group</p>
+                    </div>
+                </div>
+
+                <div class="grid-divider"></div>
+
+                <p class="section-label">Property Characteristics</p>
+                <div class="row g-3 mb-0">
+                    <div class="col-md-6">
+                        <label for="AveRooms" class="form-label">Avg. Rooms</label>
+                        <div class="input-icon-wrap">
+                            <input type="text" class="form-control" id="AveRooms" name="AveRooms" placeholder="e.g. 5.4" required>
+                            <span class="field-icon">rm</span>
+                        </div>
+                        <p class="field-hint">Average rooms per household</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="AveBedrms" class="form-label">Avg. Bedrooms</label>
+                        <div class="input-icon-wrap">
+                            <input type="text" class="form-control" id="AveBedrms" name="AveBedrms" placeholder="e.g. 1.1" required>
+                            <span class="field-icon">bd</span>
+                        </div>
+                        <p class="field-hint">Average bedrooms per household</p>
+                    </div>
+                </div>
+
+                <div class="grid-divider"></div>
+
+                <p class="section-label">Geographic Location</p>
+                <div class="row g-3 mb-0">
+                    <div class="col-md-6">
+                        <label for="Latitude" class="form-label">Latitude</label>
+                        <div class="input-icon-wrap">
+                            <input type="text" class="form-control" id="Latitude" name="Latitude" placeholder="e.g. 34.05" required>
+                            <span class="field-icon">°N</span>
+                        </div>
+                        <p class="field-hint">Block group latitude coordinate</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="Longitude" class="form-label">Longitude</label>
+                        <div class="input-icon-wrap">
+                            <input type="text" class="form-control" id="Longitude" name="Longitude" placeholder="e.g. -118.24" required>
+                            <span class="field-icon">°W</span>
+                        </div>
+                        <p class="field-hint">Block group longitude coordinate</p>
+                    </div>
+                </div>
+
+                <div class="grid-divider"></div>
+
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <button type="submit" name="predict" class="btn-predict">
+                        Run Prediction
+                    </button>
+                    <button type="reset" class="btn-reset">
+                        Clear Fields
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <p class="footer-note">
+            Predictions based on the 1990 California Census. Values are statistical estimates only.
+        </p>
+    </div>
+</div>
 </body>
 </html>
