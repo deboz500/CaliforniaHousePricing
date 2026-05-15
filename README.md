@@ -21,7 +21,10 @@ py -3 -m venv venv
 ```
 
 ### Git Configurations
+```
 git config --global user.name "[name]"
+```
+```
 git config --global user.email "[email]"
-
+```
 
